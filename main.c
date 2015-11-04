@@ -310,21 +310,16 @@ static int parse_addsub_expr
   double sign;
   double* ar = NULL;
   double br;
-  double* al = NULL;
-  double bl;
   double konst;
   int err = -1;
   const char* saved_s;
   size_t saved_len;
 
-  al = malloc(n * sizeof(double));
-  if (al == NULL) goto on_error;
-
   ar = malloc(n * sizeof(double));
   if (ar == NULL) goto on_error;
 
   /* parse left term */
-  if (parse_one_term(s, len, al, n, &bl)) goto on_error;
+  if (parse_one_term(s, len, a, n, b)) goto on_error;
 
   while (1)
   {
@@ -349,8 +344,8 @@ static int parse_addsub_expr
       /* reduce left op right into left */
       if (tok.type == LINEQ_TOK_ADD) sign = 1.0;
       else sign = -1.0;
-      for (i = 0; i != n; ++i) al[i] += ar[i] * sign;
-      bl += br * sign;
+      for (i = 0; i != n; ++i) a[i] += ar[i] * sign;
+      *b += br * sign;
     }
     else if ((tok.type == LINEQ_TOK_DIV) || (tok.type == LINEQ_TOK_MUL))
     {
@@ -369,9 +364,9 @@ static int parse_addsub_expr
       if (i != n)
       {
 	/* form 1. check and swap sides. */
-	konst = bl;
-	for (i = 0; (i != n) && (is_real_zero(al[i])); ++i) al[i] = ar[i];
-	bl = br;
+	konst = *b;
+	for (i = 0; (i != n) && (is_real_zero(a[i])); ++i) a[i] = ar[i];
+	*b = br;
 	if (i != n) goto on_error;
       }
 
@@ -380,31 +375,26 @@ static int parse_addsub_expr
       {
 	if (is_real_zero(konst))
 	{
-	  for (i = 0; i != n; ++i) al[i] = 0.0;
-	  bl = 0.0;
+	  for (i = 0; i != n; ++i) a[i] = 0.0;
+	  *b = 0.0;
 	}
 	else
 	{
-	  for (i = 0; i != n; ++i) al[i] /= konst;
-	  bl /= konst;
+	  for (i = 0; i != n; ++i) a[i] /= konst;
+	  *b /= konst;
 	}
       }
       else
       {
-	for (i = 0; i != n; ++i) al[i] *= konst;
-	bl *= konst;
+	for (i = 0; i != n; ++i) a[i] *= konst;
+	*b *= konst;
       }
     }
   }
 
-  /* reduce pending left term */
-  for (i = 0; i != n; ++i) a[i] = al[i];
-  *b = bl;
-
   err = 0;
 
  on_error:
-  if (al != NULL) free(al);
   if (ar != NULL) free(ar);
   return err;
 }
@@ -478,6 +468,9 @@ int main(int ac, char** av)
     "CALC4 = (IN2 + 3 + IN3 + 5) / 2",
     "CALC4 = ((IN2 + 3) + (IN3 + 5)) / 2",
     "CALC4 = ((IN2 + 3) + (IN3 + 5)) / 2",
+
+    "CALC4 = 4.68 + ((IN2 + 3) + (IN3 + 5)) / 2",
+    "CALC4 = ((IN2 + 3) + (IN3 + 5)) / 2 + 4.68",
 
     NULL
   };
