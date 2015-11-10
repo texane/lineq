@@ -436,6 +436,24 @@ static int parse_lineq
 }
 
 
+static void print_lineq(const double* a, size_t n, double b)
+{
+  char plus = ' ';
+  size_t i;
+
+  for (i = 0; i != n; ++i)
+  {
+    if (is_real_zero(a[i])) continue ;
+    printf(" %c %lf * IN%zu", plus, a[i], i + 1);
+    plus = '+';
+  }
+
+  if (is_real_zero(b) == 0) printf(" %c %lf", plus, b);
+
+  printf("\n");
+}
+
+
 int main(int ac, char** av)
 {
   static const char* s[] =
@@ -479,30 +497,23 @@ int main(int ac, char** av)
   double a[n];
   double b;
   size_t i;
-  size_t j;
   size_t calc_id;
 
-  for (j = 0; s[j] != NULL; ++j)
+  for (i = 0; s[i] != NULL; ++i)
   {
-    if (parse_lineq(s[j], &calc_id, a, n, &b))
+    if (parse_lineq(s[i], &calc_id, a, n, &b))
     {
-      printf("error[%zu] %s\n", j, s[j]);
+      printf("error[%zu] %s\n", i, s[i]);
       return -1;
     }
 
     printf("\n");
     printf("xxxx\n");
 
-    printf("xxxx [%zu] %s\n", j, s[j]);
-    printf("xxxx [%zu] CALC%zu = ", j, calc_id + 1);
+    printf("xxxx [%zu] %s\n", i, s[i]);
+    printf("xxxx [%zu] CALC%zu = ", i, calc_id + 1);
 
-    for (i = 0; i != n; ++i)
-    {
-      if (is_real_zero(a[i])) continue ;
-      printf(" + %lf * IN%zu", a[i], i + 1);
-    }
-
-    printf(" + %lf\n", b);
+    print_lineq(a, n, b);
 
     printf("xxxx\n");
     printf("\n");
