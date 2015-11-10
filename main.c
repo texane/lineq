@@ -1,3 +1,8 @@
+/* https://en.wikipedia.org/wiki/Symbolic_computation */
+/* https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor */
+/* https://en.wikipedia.org/wiki/Factorization_of_polynomials */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
